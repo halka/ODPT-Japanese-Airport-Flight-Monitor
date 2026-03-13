@@ -1,6 +1,6 @@
 # ODPT Airport Flight Monitor
 
-This Python script monitors flight arrival and departure information for a specific airport using the Public Transport Open Data Center (ODPT) API and sends notifications to Discord when changes are detected.
+This is a flight arrival and departure information for a specific airport using the Public Transport Open Data Center (ODPT) API and sends notifications to Discord when changes are detected.
 
 ## Key Features
 
@@ -10,6 +10,8 @@ This Python script monitors flight arrival and departure information for a speci
 - **Flexible Configuration**: Choose to monitor arrivals, departures, or both.
 - **Multiple Environments**: Easily runs via Python natively, Docker, or Docker Compose.
 
+## Screenshots
+![1](https://raw.githubusercontent.com/halka/ODPT-Japanese-Airport-Flight-Monitor/refs/heads/main/assets/images/sample1.jpg)
 ## Setup
 
 ### Prerequisites
@@ -94,6 +96,7 @@ python monitor_airport.py
   - [X](https://x.com/a_halka)
 
 ## License
+2026 halka
 
 This software is released under the **MIT License**.
 
