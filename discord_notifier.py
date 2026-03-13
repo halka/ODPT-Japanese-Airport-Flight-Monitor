@@ -98,7 +98,7 @@ def format_embed(event_type: str, item: Dict[str, Any], old_item: Optional[Dict[
     airport_display = airport_code_from_odpt_id(item["other_airport"])
 
     # Title: flight kind emoji + flight kind + event emoji + flight number + airport display
-    title = f"{flight_kind_emoji}{event_emoji} {flight_kind} {airport_display}"
+    title = f"{event_emoji}{flight_kind_emoji} {flight_kind}{airport_display}"
 
     # ゲート/ターミナル確定チェック（null → 値 の遷移）
     ops_announced: List[str] = []

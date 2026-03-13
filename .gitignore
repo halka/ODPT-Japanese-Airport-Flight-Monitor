@@ -1,2 +1,89 @@
-# Created by venv; see https://docs.python.org/3/library/venv.html
-*
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+pip-wheel-metadata/
+*.egg-info/
+.installed.cfg
+*.egg
+
+#pyenv
+.python-version
+include/
+lib/
+bin/
+pyvenv.cfg
+
+# Unit test / coverage reports
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+htmlcov/
+
+# Type checkers / linters
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+.pylint.d/
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Django/Flask
+instance/
+.webassets-cache/
+
+# Logs & local data
+logs/
+*.log
+data/
+
+# OS / Editors
+.DS_Store
+.idea/
+.vscode/
+.editorconfig
+.claude/
+
+# Dotenv (secrets)
+.env
+.env.*
+.env.local
+
+# Pyenv
+.python-version

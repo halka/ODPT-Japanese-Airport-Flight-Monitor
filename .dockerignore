@@ -1,8 +1,70 @@
+# VCS
+.git
+.gitignore
+.gitattributes
+.github/
+
+# Python caches and artifacts
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+
+# Local virtualenvs (do not ship host venv into image)
 .venv/
-.env
-state_*.json
+venv/
+ENV/
+env/
+env.bak/
+# Common venv files if venv was created at repo root
+bin/
+lib/
+include/
+pyvenv.cfg
+
+# Packaging and wheel caches
+build/
+dist/
+.eggs/
+*.egg-info/
+wheels/
+share/python-wheels/
+pip-wheel-metadata/
+*.egg
+
+# Test/coverage caches
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.cache/
+
+# Linters/type checkers
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+.pylint.d/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Logs and local data (mounted via volume at runtime)
+logs/
+*.log
 data/
+
+# OS / Editors
+.DS_Store
+.idea/
+.vscode/
+
+# Env/secrets (never send secrets in build context)
+.env
+.env.*
+.env.local
+
+# Compose and dev-only files (not needed during build)
+docker-compose.yml
+docker-compose.yaml
+compose.yml
+compose.yaml

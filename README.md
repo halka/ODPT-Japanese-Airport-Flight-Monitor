@@ -70,14 +70,18 @@ docker run -d \
   airport-monitor
 ```
 
-### Run Natively 😇As You Like
+### Run Natively
 ```bash
-cd ODPT-Japanese-Airport-Flight-Monitor/
-cp .env.example .env
-# edit .env then
-python -m venv .
-source bin/activate
-pip -r install requirements.txt
+# 1) Create and activate a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 2) Install dependencies (upgrade build tooling is recommended)
+python -m pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt
+
+# 3) Configure environment and run
+cp .env.example .env   # edit as needed
 python monitor_airport.py
 ```
 
