@@ -1,54 +1,56 @@
+言語: 日本語 | [English](README.en.md)
+
 # ODPT Japanese Airport Flight Monitor
 
-This is a flight arrival and departure information for a specific airport using the Public Transport Open Data Center (ODPT) API and sends notifications to Discord when changes are detected.
+このプロジェクトは、公共交通オープンデータセンター（ODPT）の API を利用して特定空港の到着・出発情報を取得し、変更を検知すると Discord に通知します。
 ![Hero](https://raw.githubusercontent.com/halka/ODPT-Japanese-Airport-Flight-Monitor/refs/heads/main/assets/images/hero-image.png)
-## Key Features
 
-- **Real-time Monitoring**: Fetches the latest flight information using the ODPT API.
-- **Differential Notifications**: Compares current data with previous state to detect and notify about new flights, status changes, or removals (optional).
-- **Discord Integration**: Sends notifications via Discord Webhooks using rich Embed formats.
-- **Flexible Configuration**: Choose to monitor arrivals, departures, or both.
-- **Multiple Environments**: Easily runs via Python natively, Docker, or Docker Compose.
+## 主な機能
 
-## Screenshots
+- **リアルタイム監視**: ODPT API を用いて最新のフライト情報を取得します。
+- **差分通知**: 直前の状態と比較し、新規便・ステータス変更・削除（任意）を検出して通知します。
+- **Discord 連携**: Discord Webhook を使い、リッチな Embed 形式で通知します。
+- **柔軟な設定**: 到着・出発・両方のいずれかを選んで監視できます。
+- **複数の実行方法**: Python（ネイティブ）、Docker、Docker Compose に対応。
+
+## スクリーンショット
 ![1](https://raw.githubusercontent.com/halka/ODPT-Japanese-Airport-Flight-Monitor/refs/heads/main/assets/images/sample1.jpg)
 
-## Setup
+## セットアップ
 
-### Prerequisites
-- Docker and Docker Compose
-- [Public Transport Open Data Center](https://developer.odpt.org/) API Key (Consumer Key)
+### 前提条件
+- Docker と Docker Compose
+- [公共交通オープンデータセンター（ODPT）](https://developer.odpt.org/) の API キー（Consumer Key）
 - Discord Webhook URL
 
-### Configuration
+### 設定
 
-Copy the example environment file and configure the variables:
+サンプル環境ファイルをコピーし、各変数を設定します:
 
 ```bash
 cp .env.example .env
 ```
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `ODPT_CONSUMER_KEY` | **(Required)** Your ODPT API key. | - |
-| `DISCORD_WEBHOOK_URL` | **(Required)** Your Discord webhook URL. | - |
-| `AIRPORT` | 3-letter IATA airport code you want to monitor. | `HKD` |
-| `MODE` | Notification mode (`arrivals`, `departures`, or `both`). | `both` |
-| `POLL_INTERVAL_SEC` | How frequently to check the API (in seconds). | `180` |
-| `NOTIFY_REMOVED` | Set to `1` to send an alert when a flight is removed. | `0` |
-| `DISCORD_ALERT_COLUMN_NUM` | Set Column's of Discord Notification | `3` |
-| `DISCORD_THREAD_ID` | Optional ID for Forum/Thread posting. | - |
-| `STATE_FILE` | Location to store the current flight state. | `data/state_[airport].json` |
-| `RUN_FOREVER` | Set to `0` to run the check exactly once and exit. | `1` |
-| `STARTUP_NOTICE` | `1` to post a startup notice to Discord on launch, `0` to disable. | `1` |
-| `STARTUP_LOGO_URL` | Optional image URL for the startup notice (shown as a thumbnail). | - |
+| 変数 | 説明 | 既定値 |
+|------|------|--------|
+| `ODPT_CONSUMER_KEY` | 【必須】ODPT の API キー。 | - |
+| `DISCORD_WEBHOOK_URL` | 【必須】Discord の Webhook URL。 | - |
+| `AIRPORT` | 監視対象の IATA 空港コード（3 文字）。 | `HKD` |
+| `MODE` | 通知モード（`arrivals` / `departures` / `both`）。 | `both` |
+| `POLL_INTERVAL_SEC` | API をポーリングする間隔（秒）。 | `180` |
+| `NOTIFY_REMOVED` | 便が削除された際にも通知するなら `1`。 | `0` |
+| `DISCORD_ALERT_COLUMN_NUM` | Discord 通知のカラム数。 | `3` |
+| `DISCORD_THREAD_ID` | フォーラム/スレッドに投稿する場合の任意の ID。 | - |
+| `STATE_FILE` | 現在のフライト状態を保存するファイルの場所。 | `data/state_[airport].json` |
+| `RUN_FOREVER` | `0` にすると 1 回だけ実行して終了。 | `1` |
+| `STARTUP_NOTICE` | 起動時に Discord へ通知するなら `1`、無効は `0`。 | `1` |
+| `STARTUP_LOGO_URL` | 起動通知のサムネイルに使う任意の画像 URL。 | - |
 
-## Usage
+## 使い方
 
-*Note: For a one-time execution (like in a cron job), set `RUN_FOREVER=0` in your `.env` file.*
+※ 単発実行（cron など）を行う場合は `.env` の `RUN_FOREVER=0` を設定してください。
 
-### Run with Docker Compose
-**Docker Compose with pre-built image: ⭐ Recommended**
+### Docker Compose で実行（推奨・事前ビルド済みイメージ）
 ```yaml
 services:
   airport-monitor:
@@ -63,11 +65,11 @@ services:
       - ./data:/app/data
 ```
 
-### Run with Pre-built Docker Image
+### 事前ビルド済み Docker イメージで実行
 
-Instead of building locally, you can use the pre-built image from Docker Hub or GitHub Container Registry:
+ローカルでビルドせず、Docker Hub または GitHub Container Registry の事前ビルド済みイメージを利用できます。
 
-**From Docker Hub:**
+**Docker Hub から:**
 ```bash
 mkdir -p data
 docker run -d \
@@ -78,7 +80,7 @@ docker run -d \
   halka/odpt-japanese-airport-flight-monitor:latest
 ```
 
-**From GitHub Container Registry:**
+**GitHub Container Registry から:**
 ```bash
 mkdir -p data
 docker run -d \
@@ -89,22 +91,22 @@ docker run -d \
   ghcr.io/halka/odpt-japanese-airport-flight-monitor:latest
 ```
 
-### Running via Docker Compose
-Ensure the `data` directory exists locally so state can persist.
+### Docker Compose での実行（ビルド/起動）
+ローカルに `data` ディレクトリを作成しておくと状態が永続化されます。
 
 ```bash
 mkdir -p data
 docker compose up -d --build
 ```
 
-You can view logs via:
+ログの確認:
 ```bash
 docker compose logs -f
 ```
 
-### Run with Docker
+### Docker で実行（ローカルビルド）
 
-To build and run the Docker image yourself:
+自分で Docker イメージをビルドして実行する場合:
 
 ```bash
 docker build -t airport-monitor .
@@ -116,30 +118,30 @@ docker run -d \
   airport-monitor
 ```
 
-### Run Natively
+### ローカル環境で実行（ネイティブ）
 ```bash
-# 1) Create and activate a virtual environment
+# 1) 仮想環境を作成・有効化
 python3 -m venv .venv
 source .venv/bin/activate
 
-# 2) Install dependencies (upgrade build tooling is recommended)
+# 2) 依存パッケージをインストール（ビルド系ツールの更新を推奨）
 python -m pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
 
-# 3) Configure environment and run
-cp .env.example .env   # edit as needed
+# 3) 環境を設定して起動
+cp .env.example .env   # 必要に応じて編集
 python monitor_airport.py
 ```
 
-## Docker Image Tags
+## Docker イメージのタグ
 
-Images are automatically built and pushed to both Docker Hub and GitHub Container Registry when changes are pushed to the `main` branch.
+`main` ブランチへ変更が push されると、Docker Hub と GitHub Container Registry の両方に自動でビルド・公開されます。
 
-### Available Tags:
-- `latest` - Latest build from main branch
-- `main` - Latest build from main branch
-- Branch-specific tags (e.g., `main-abc123def`)
-- Semantic version tags (e.g., `v1.0.0`, `1.0`)
+### 利用可能なタグ
+- `latest` - main ブランチからの最新ビルド
+- `main` - main ブランチからの最新ビルド
+- ブランチ固有タグ（例: `main-abc123def`）
+- セマンティックバージョン（例: `v1.0.0`, `1.0`）
 
 ### Docker Hub:
 ```bash
@@ -151,17 +153,17 @@ docker pull halka/odpt-japanese-airport-flight-monitor:latest
 docker pull ghcr.io/halka/odpt-japanese-airport-flight-monitor:latest
 ```
 
-## Author
+## 作者
 
 - [halka](https://halka.jp)
   - [GitHub](https://github.com/halka)
   - [X](https://x.com/a_halka)
 
-## License
-&copy;2026 halka
+## ライセンス
+©2026 halka
 
-This software is released under the **MIT License**.
+このソフトウェアは **MIT License** の下で提供されます。
 
-The data used in this project is provided by the Public Transport Open Data Center.
+本プロジェクトで利用するデータは公共交通オープンデータセンターにより提供されています。
 
-For details, please refer to the [Public Transport Open Data Center Terms of Use](https://rules.odpt.org/).
+詳細は [公共交通オープンデータセンター 利用規約](https://rules.odpt.org/) をご確認ください。
