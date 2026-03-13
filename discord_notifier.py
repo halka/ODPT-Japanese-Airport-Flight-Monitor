@@ -225,14 +225,15 @@ def post_discord(embeds: List[Dict[str, Any]]) -> None:
     if DISCORD_THREAD_ID:
         params["thread_id"] = DISCORD_THREAD_ID
 
-    # Use ICAO for monitor name
-    airport_display = TARGET_AIRPORT_CODE
+    # Use Airport Name from config if available; fallback to ICAO code (e.g. HND)
+    airport_name = AIRPORT_MAP.get(TARGET_AIRPORT_CODE, {}).get("title", "???")
+    airport_name_code = TARGET_AIRPORT_CODE
     info = AIRPORT_MAP.get(TARGET_AIRPORT_CODE)
     if info and info.get("icao"):
-        airport_display = info["icao"]
+        airport_name_code = info["icao"]
 
     payload = {
-        "username": f"{airport_display} Flight Monitor",
+        "username": f"{airport_name}({airport_name_code})",
         "embeds": embeds,
         "allowed_mentions": {"parse": []},
     }
