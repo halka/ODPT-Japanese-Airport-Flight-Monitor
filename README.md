@@ -33,6 +33,7 @@ cp .env.example .env
 | `MODE` | Notification mode (`arrivals`, `departures`, or `both`). | `both` |
 | `POLL_INTERVAL_SEC` | How frequently to check the API (in seconds). | `180` |
 | `NOTIFY_REMOVED` | Set to `1` to send an alert when a flight is removed. | `0` |
+| `DISCORD_ALERT_COLUMN_NUM` | Set Column's of Discord Notification | `3` |
 | `DISCORD_THREAD_ID` | Optional ID for Forum/Thread posting. | - |
 | `STATE_FILE` | Location to store the current flight state. | `data/state_[airport].json` |
 | `RUN_FOREVER` | Set to `0` to run the check exactly once and exit. | `1` |
@@ -69,9 +70,15 @@ docker run -d \
   airport-monitor
 ```
 
-### Run Natively
+### Run Natively 😇As You Like
 ```bash
-cd
+cd ODPT-Japanese-Airport-Flight-Monitor/
+cp .env.example .env
+# edit .env then
+python -m venv .
+source bin/activate
+pip -r install requirements.txt
+python monitor_airport.py
 ```
 
 ## Author

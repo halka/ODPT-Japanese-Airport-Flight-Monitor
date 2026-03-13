@@ -59,7 +59,7 @@ def airport_code_from_odpt_id(odpt_id: Any) -> str:
         icao = info.get("icao")
         title = info.get("title")
         if icao and title:
-            return f"{icao} {title}"
+            return f"{title} / {icao}"
         elif icao:
             return icao
         elif title:

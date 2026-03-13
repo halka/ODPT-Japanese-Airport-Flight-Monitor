@@ -9,6 +9,7 @@ from config import (
     AIRPORT_MAP,
     DISCORD_THREAD_ID,
     DISCORD_WEBHOOK_URL,
+    DISCORD_ALERT_COLUMN_NUM,
     HTTP_TIMEOUT_SEC,
     TARGET_AIRPORT_CODE,
     TARGET_AIRPORT_ODPT_ID,
@@ -49,7 +50,7 @@ _SPACER: Dict[str, Any] = {"name": "\u200b", "value": "\u200b", "inline": True}
 
 
 def _pad_to_grid(fields: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Pad inline-field rows with spacers so each row has exactly 3 columns."""
+    """Pad inline-field rows with spacers so each row has exactly N columns."""
     result: List[Dict[str, Any]] = []
     inline_count = 0
     for field in fields:
@@ -58,20 +59,27 @@ def _pad_to_grid(fields: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             inline_count += 1
         else:
             # flush current row before a full-width field
-            while inline_count % 3:
+            while inline_count % DISCORD_ALERT_COLUMN_NUM:
                 result.append(_SPACER)
                 inline_count += 1
             result.append(field)
             inline_count = 0
     # flush final row
-    while inline_count % 3:
+    while inline_count % DISCORD_ALERT_COLUMN_NUM:
         result.append(_SPACER)
         inline_count += 1
     return result
 
 
 def format_embed(event_type: str, item: Dict[str, Any], old_item: Optional[Dict[str, Any]]) -> Dict[str, Any]:
-    kind_emoji = "\U0001f6ec" if item["kind"] == "arrival" else "\U0001f6eb"
+    flight_kind, flight_kind_emoji = "不明", "❓"
+    if item["kind"] == "arrival":
+        flight_kind = "From: "
+        flight_kind_emoji = "\U0001f6ec"
+    elif item["kind"] == "departure":
+        flight_kind = "To: "
+        flight_kind_emoji = "\U0001f6eb"
+
     event_emoji = {"added": "", "changed": "\U0001f504 ", "removed": "\U0001f6ab "}.get(event_type, "")
     description = ""
     # Flight Number ICAO Conversion — use operating_flight_number (title/author only)
@@ -89,8 +97,8 @@ def format_embed(event_type: str, item: Dict[str, Any], old_item: Optional[Dict[
 
     airport_display = airport_code_from_odpt_id(item["other_airport"])
 
-    # Title: kind emoji + destination / origin airport
-    title = f"{event_emoji}{kind_emoji} {airport_display}"
+    # Title: flight kind emoji + flight kind + event emoji + flight number + airport display
+    title = f"{flight_kind_emoji}{event_emoji} {flight_kind} {airport_display}"
 
     # ゲート/ターミナル確定チェック（null → 値 の遷移）
     ops_announced: List[str] = []
@@ -176,7 +184,7 @@ def format_embed(event_type: str, item: Dict[str, Any], old_item: Optional[Dict[
     # Metadata for links / logos
     url = None
     logo_url = None
-    operating = item.get("operating_flight_number") or item.get("flight_number", "-")
+    operating = item.get("flight_number", "-")
     if operating != "-":
         first_fn = operating.split(",")[0].strip().replace(" ", "")
         first_icao = icao_flight_nums[0] if icao_flight_nums else first_fn
@@ -191,12 +199,12 @@ def format_embed(event_type: str, item: Dict[str, Any], old_item: Optional[Dict[
     )
     fields = _pad_to_grid(fields)
 
-    footer_parts = [f"Issued: {j(item.get('generated_at'))}\nValid: {item.get('valid_until', '-')}\n{item.get('fingerprint', '-')}"]
+    footer_parts = [f"Issued At: {j(item.get('generated_at'))}\n{item.get('fingerprint', '-')}"]
 
     # Author: logo + flight number (with FlightAware link) — shown whenever a flight number exists
     author = None
     if display_flight_number != "-":
-        author = {"name": display_flight_number, "url": url}
+        author = {"name": f"{item.get("operating_flight_number")} / {display_flight_number}", "url": url}
         if logo_url:
             author["icon_url"] = logo_url
 

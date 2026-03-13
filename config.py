@@ -25,6 +25,9 @@ MODE = os.getenv("MODE", "both").strip().lower()
 # Set to 1 to notify when a flight disappears from the feed
 NOTIFY_REMOVED = os.getenv("NOTIFY_REMOVED", "0") == "1"
 
+# Number of columns for Discord alert embeds (1-10)
+DISCORD_ALERT_COLUMN_NUM = int(os.getenv("DISCORD_ALERT_COLUMN_NUM", "3"))
+
 # Optional for Forum / Media channel thread posting
 DISCORD_THREAD_ID = os.getenv("DISCORD_THREAD_ID", "").strip()
 
