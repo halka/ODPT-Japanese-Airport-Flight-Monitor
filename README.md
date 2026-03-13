@@ -47,18 +47,20 @@ cp .env.example .env
 
 *Note: For a one-time execution (like in a cron job), set `RUN_FOREVER=0` in your `.env` file.*
 
-### Run with Docker Compose ⭐ Recommended
+### Run with Docker Compose
+**Docker Compose with pre-built image: ⭐ Recommended**
+```yaml
+services:
+  airport-monitor:
+    image: ghcr.io/halka/odpt-japanese-airport-flight-monitor:latest
+    # or image: halka/odpt-japanese-airport-flight-monitor:latest
 
-Running via Docker Compose is recommended for continuous, background execution. Ensure the `data` directory exists locally so state can persist.
-
-```bash
-mkdir -p data
-docker compose up -d --build
-```
-
-You can view logs via:
-```bash
-docker compose logs -f
+    container_name: airport-monitor
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
 ```
 
 ### Run with Pre-built Docker Image
@@ -87,21 +89,17 @@ docker run -d \
   ghcr.io/halka/odpt-japanese-airport-flight-monitor:latest
 ```
 
-**Docker Compose with pre-built image:**
-```yaml
-version: '3.8'
+### Running via Docker Compose
+Ensure the `data` directory exists locally so state can persist.
 
-services:
-  airport-monitor:
-    image: halka/odpt-japanese-airport-flight-monitor:latest
-    # または image: ghcr.io/halka/odpt-japanese-airport-flight-monitor:latest
+```bash
+mkdir -p data
+docker compose up -d --build
+```
 
-    container_name: airport-monitor
-    restart: unless-stopped
-    env_file:
-      - .env
-    volumes:
-      - ./data:/app/data
+You can view logs via:
+```bash
+docker compose logs -f
 ```
 
 ### Run with Docker
@@ -160,7 +158,7 @@ docker pull ghcr.io/halka/odpt-japanese-airport-flight-monitor:latest
   - [X](https://x.com/a_halka)
 
 ## License
-2026 halka
+&copy;2026 halka
 
 This software is released under the **MIT License**.
 
