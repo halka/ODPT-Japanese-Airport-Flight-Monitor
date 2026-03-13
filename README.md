@@ -12,6 +12,7 @@ This is a flight arrival and departure information for a specific airport using 
 
 ## Screenshots
 ![1](https://raw.githubusercontent.com/halka/ODPT-Japanese-Airport-Flight-Monitor/refs/heads/main/assets/images/sample1.jpg)
+
 ## Setup
 
 ### Prerequisites
@@ -38,15 +39,15 @@ cp .env.example .env
 | `DISCORD_ALERT_COLUMN_NUM` | Set Column's of Discord Notification | `3` |
 | `DISCORD_THREAD_ID` | Optional ID for Forum/Thread posting. | - |
 | `STATE_FILE` | Location to store the current flight state. | `data/state_[airport].json` |
-|| `RUN_FOREVER` | Set to `0` to run the check exactly once and exit. | `1` |
-|| `STARTUP_NOTICE` | `1` to post a startup notice to Discord on launch, `0` to disable. | `1` |
-|| `STARTUP_LOGO_URL` | Optional image URL for the startup notice (shown as a thumbnail). | - |
+| `RUN_FOREVER` | Set to `0` to run the check exactly once and exit. | `1` |
+| `STARTUP_NOTICE` | `1` to post a startup notice to Discord on launch, `0` to disable. | `1` |
+| `STARTUP_LOGO_URL` | Optional image URL for the startup notice (shown as a thumbnail). | - |
 
 ## Usage
 
 *Note: For a one-time execution (like in a cron job), set `RUN_FOREVER=0` in your `.env` file.*
 
-### Run with Docker Compose ⭐️Recommended
+### Run with Docker Compose ⭐ Recommended
 
 Running via Docker Compose is recommended for continuous, background execution. Ensure the `data` directory exists locally so state can persist.
 
@@ -58,6 +59,49 @@ docker compose up -d --build
 You can view logs via:
 ```bash
 docker compose logs -f
+```
+
+### Run with Pre-built Docker Image
+
+Instead of building locally, you can use the pre-built image from Docker Hub or GitHub Container Registry:
+
+**From Docker Hub:**
+```bash
+mkdir -p data
+docker run -d \
+  --name airport-monitor \
+  --restart unless-stopped \
+  --env-file .env \
+  -v $(pwd)/data:/app/data \
+  halka/odpt-japanese-airport-flight-monitor:latest
+```
+
+**From GitHub Container Registry:**
+```bash
+mkdir -p data
+docker run -d \
+  --name airport-monitor \
+  --restart unless-stopped \
+  --env-file .env \
+  -v $(pwd)/data:/app/data \
+  ghcr.io/halka/odpt-japanese-airport-flight-monitor:latest
+```
+
+**Docker Compose with pre-built image:**
+```yaml
+version: '3.8'
+
+services:
+  airport-monitor:
+    image: halka/odpt-japanese-airport-flight-monitor:latest
+    # または image: ghcr.io/halka/odpt-japanese-airport-flight-monitor:latest
+
+    container_name: airport-monitor
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
 ```
 
 ### Run with Docker
@@ -87,6 +131,26 @@ pip install -r requirements.txt
 # 3) Configure environment and run
 cp .env.example .env   # edit as needed
 python monitor_airport.py
+```
+
+## Docker Image Tags
+
+Images are automatically built and pushed to both Docker Hub and GitHub Container Registry when changes are pushed to the `main` branch.
+
+### Available Tags:
+- `latest` - Latest build from main branch
+- `main` - Latest build from main branch
+- Branch-specific tags (e.g., `main-abc123def`)
+- Semantic version tags (e.g., `v1.0.0`, `1.0`)
+
+### Docker Hub:
+```bash
+docker pull halka/odpt-japanese-airport-flight-monitor:latest
+```
+
+### GitHub Container Registry:
+```bash
+docker pull ghcr.io/halka/odpt-japanese-airport-flight-monitor:latest
 ```
 
 ## Author
