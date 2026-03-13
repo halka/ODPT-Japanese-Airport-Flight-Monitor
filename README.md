@@ -1,7 +1,7 @@
 # ODPT Airport Flight Monitor
 
 This is a flight arrival and departure information for a specific airport using the Public Transport Open Data Center (ODPT) API and sends notifications to Discord when changes are detected.
-
+![Hero](https://raw.githubusercontent.com/halka/ODPT-Japanese-Airport-Flight-Monitor/refs/heads/main/assets/images/hero-image.png)
 ## Key Features
 
 - **Real-time Monitoring**: Fetches the latest flight information using the ODPT API.
