@@ -1,0 +1,11 @@
+services:
+  airport-monitor:
+    image: ghcr.io/halka/odpt-japanese-airport-flight-monitor:latest
+    # or image: halka/odpt-japanese-airport-flight-monitor:latest
+
+    container_name: airport-monitor
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
