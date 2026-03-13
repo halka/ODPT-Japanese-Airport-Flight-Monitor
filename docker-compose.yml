@@ -1,0 +1,10 @@
+name: airport-monitor
+services:
+  airport-monitor:
+    build: .
+    container_name: airport-monitor
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data

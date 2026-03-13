@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+.env
+
+# Project specific
+state_*.json
+*.tmp
+
+# IDE specific
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.editorconfig
+
+# LLM specific
+*.log
+*.cache
+.claude/
+
+# OS specific
+.DS_Store
+Thumbs.db
+
