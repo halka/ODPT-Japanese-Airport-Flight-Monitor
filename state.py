@@ -7,7 +7,15 @@ import time
 from typing import Any, Dict, Optional
 
 from api import fetch_arrivals, fetch_departures, fetch_status_map
-from config import MODE, STATE_FILE, TARGET_AIRPORT_CODE, TARGET_AIRPORT_ODPT_ID
+from config import (
+    MODE,
+    STATE_FILE,
+    TARGET_AIRPORT_CODE,
+    TARGET_AIRPORT_ODPT_ID,
+    STATE_ARCHIVE,
+    STATE_ARCHIVE_DIR,
+    STATE_ARCHIVE_RETENTION_DAYS,
+)
 from utils import as_list
 
 
@@ -104,6 +112,66 @@ def save_state(state: Dict[str, Any]) -> None:
     with tmp.open("w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
     tmp.replace(STATE_FILE)
+
+
+def archive_state_snapshot(state: Dict[str, Any]) -> None:
+    """Write a timestamped snapshot of the state for audit/log purposes.
+
+    Creates files like: data/state_archive/state_hkd_2026-03-13T08-05-10Z.json
+    Applies a simple retention policy based on STATE_ARCHIVE_RETENTION_DAYS.
+    No-op if STATE_ARCHIVE is disabled.
+    """
+    if not STATE_ARCHIVE:
+        return
+
+    # Ensure archive directory exists
+    STATE_ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Use saved_at_epoch when available for deterministic timestamps
+    ts_epoch = state.get("saved_at_epoch") or int(time.time())
+    # Build a filesystem-safe UTC timestamp
+    try:
+        from datetime import datetime, timezone
+        dt = datetime.fromtimestamp(ts_epoch, tz=timezone.utc)
+        ts = dt.isoformat(timespec="seconds").replace(":", "-").replace("+00:00", "Z")
+    except Exception:
+        ts = str(int(ts_epoch))
+
+    airport = str(state.get("target_airport_code") or TARGET_AIRPORT_CODE).lower()
+    snap_path = STATE_ARCHIVE_DIR / f"state_{airport}_{ts}.json"
+
+    tmp = snap_path.with_suffix(".tmp")
+    with tmp.open("w", encoding="utf-8") as f:
+        json.dump(state, f, ensure_ascii=False)
+    tmp.replace(snap_path)
+
+    # Retention cleanup (best-effort)
+    if STATE_ARCHIVE_RETENTION_DAYS > 0:
+        try:
+            from datetime import datetime, timedelta
+            cutoff = datetime.utcnow() - timedelta(days=STATE_ARCHIVE_RETENTION_DAYS)
+            prefix = f"state_{airport}_"
+            for p in STATE_ARCHIVE_DIR.glob(f"{prefix}*.json"):
+                name = p.name
+                try:
+                    ts_part = name[len(prefix):-5]
+                    # Convert 2026-03-13T08-05-10Z -> 2026-03-13T08:05:10Z for parsing
+                    if ts_part.endswith("Z") and "T" in ts_part:
+                        date_part, time_part_z = ts_part.split("T", 1)
+                        time_part = time_part_z[:-1].replace("-", ":")
+                        ts_iso = f"{date_part}T{time_part}Z"
+                        dt_file = datetime.strptime(ts_iso, "%Y-%m-%dT%H:%M:%SZ")
+                    else:
+                        dt_file = datetime.utcfromtimestamp(int(ts_part))
+                except Exception:
+                    continue
+                if dt_file < cutoff:
+                    try:
+                        p.unlink(missing_ok=True)
+                    except Exception:
+                        pass
+        except Exception:
+            pass
 
 
 def build_current_state() -> Dict[str, Any]:

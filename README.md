@@ -36,7 +36,9 @@ cp .env.example .env
 | `DISCORD_ALERT_COLUMN_NUM` | Set Column's of Discord Notification | `3` |
 | `DISCORD_THREAD_ID` | Optional ID for Forum/Thread posting. | - |
 | `STATE_FILE` | Location to store the current flight state. | `data/state_[airport].json` |
-| `RUN_FOREVER` | Set to `0` to run the check exactly once and exit. | `1` |
+|| `RUN_FOREVER` | Set to `0` to run the check exactly once and exit. | `1` |
+|| `STARTUP_NOTICE` | `1` to post a startup notice to Discord on launch, `0` to disable. | `1` |
+|| `STARTUP_LOGO_URL` | Optional image URL for the startup notice (shown as a thumbnail). | - |
 
 ## Usage
 

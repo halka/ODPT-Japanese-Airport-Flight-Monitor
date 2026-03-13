@@ -188,6 +188,7 @@ def format_embed(event_type: str, item: Dict[str, Any], old_item: Optional[Dict[
     if operating != "-":
         first_fn = operating.split(",")[0].strip().replace(" ", "")
         first_icao = icao_flight_nums[0] if icao_flight_nums else first_fn
+        operating = f"{operating} / {first_icao}"  # for lookup only; title/author use converted ICAO version
         url = f"https://www.flightaware.com/live/flight/{first_icao}"
         iata = first_fn[:2].upper()
         if iata:
@@ -201,10 +202,16 @@ def format_embed(event_type: str, item: Dict[str, Any], old_item: Optional[Dict[
 
     footer_parts = [f"Issued At: {j(item.get('generated_at'))}\n{item.get('fingerprint', '-')}"]
 
-    # Author: logo + flight number (with FlightAware link) — shown whenever a flight number exists
+    # Author/header: show primary flight as IATA/ICAO pair (e.g., JL584 / JAL584) with logo
     author = None
-    if display_flight_number != "-":
-        author = {"name": f"{item.get("operating_flight_number")} / {display_flight_number}", "url": url}
+    if operating and operating != "-":
+        first_iata = first_fn  # e.g., JL584
+        first_icao_display = first_icao  # e.g., JAL584 (if mapping exists)
+        if first_icao_display and first_icao_display != first_iata:
+            author_name = f"{first_iata} / {first_icao_display}"
+        else:
+            author_name = first_iata
+        author = {"name": author_name, "url": url}
         if logo_url:
             author["icon_url"] = logo_url
 

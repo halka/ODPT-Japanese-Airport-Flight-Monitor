@@ -31,9 +31,18 @@ DISCORD_ALERT_COLUMN_NUM = int(os.getenv("DISCORD_ALERT_COLUMN_NUM", "3"))
 # Optional for Forum / Media channel thread posting
 DISCORD_THREAD_ID = os.getenv("DISCORD_THREAD_ID", "").strip()
 
+# Toggle for posting a startup notice to Discord on process launch
+STARTUP_NOTICE = os.getenv("STARTUP_NOTICE", "1") == "1"
+STARTUP_LOGO_URL = os.getenv("STARTUP_LOGO_URL", "").strip()
+
 STATE_FILE = Path(os.getenv("STATE_FILE", f"data/state_{AIRPORT.lower()}.json"))
 HTTP_TIMEOUT_SEC = int(os.getenv("HTTP_TIMEOUT_SEC", "30"))
 POLL_INTERVAL_SEC = int(os.getenv("POLL_INTERVAL_SEC", "180"))
+
+# Archive snapshots of the state to timestamped files (as a log)
+STATE_ARCHIVE = os.getenv("STATE_ARCHIVE", "1") == "1"
+STATE_ARCHIVE_DIR = Path(os.getenv("STATE_ARCHIVE_DIR", "data/state_archive"))
+STATE_ARCHIVE_RETENTION_DAYS = int(os.getenv("STATE_ARCHIVE_RETENTION_DAYS", "14"))
 
 # Load airline mapping from external JSON
 AIRLINE_MAPPING_FILE = Path(__file__).parent / "airline_mapping.json"
