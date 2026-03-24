@@ -1,5 +1,7 @@
 言語: 日本語 | [English](README.en.md)
 
+[![Build and Push Docker Image airport-flight-monitor](https://github.com/halka/ODPT-Japanese-Airport-Flight-Monitor/actions/workflows/docker-image.yml/badge.svg?branch=main)](https://github.com/halka/ODPT-Japanese-Airport-Flight-Monitor/actions/workflows/docker-image.yml)
+
 # ODPT Japanese Airport Flight Monitor
 
 このプロジェクトは、公共交通オープンデータセンター（ODPT）の API を利用して特定空港の到着・出発情報を取得し、変更を検知すると Discord Bot を通じて通知します。
