@@ -5,7 +5,7 @@ import os
 import sys
 import time
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import requests
 
@@ -13,6 +13,17 @@ from config import MODE, POLL_INTERVAL_SEC, STARTUP_LOGO_URL, STARTUP_NOTICE, ST
 from diff import diff_states
 from discord_notifier import format_embed, post_discord
 from state import build_current_state, load_state, save_state, archive_state_snapshot
+
+
+_JST = timezone(timedelta(hours=9))
+
+
+def _same_jst_date(epoch_a: float, epoch_b: float) -> bool:
+    """Return True if both Unix epochs fall on the same calendar day in JST (UTC+9)."""
+    return (
+        datetime.fromtimestamp(epoch_a, tz=_JST).date()
+        == datetime.fromtimestamp(epoch_b, tz=_JST).date()
+    )
 
 
 class ISO8601Formatter(logging.Formatter):
@@ -60,6 +71,18 @@ def _post_startup_notice(run_forever: bool) -> None:
 def run_once() -> int:
     current = build_current_state()
     previous = load_state()
+
+    # Discard cross-day state to avoid spurious diffs (e.g. "航行中→出発済み" across midnight).
+    # Flight IDs in ODPT may not include a date component, so comparing yesterday's saved
+    # state against today's API data produces meaningless "changed" events.
+    if previous and not _same_jst_date(
+        previous.get("saved_at_epoch", 0), current["saved_at_epoch"]
+    ):
+        logging.info(
+            "JST date changed since last save — resetting state for %s to avoid cross-day diffs.",
+            TARGET_AIRPORT_CODE,
+        )
+        previous = {}
 
     if not previous:
         save_state(current)
