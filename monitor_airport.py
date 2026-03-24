@@ -7,12 +7,15 @@ import time
 import logging
 from datetime import datetime, timedelta, timezone
 
+import threading
+
 import requests
 
-from config import MODE, POLL_INTERVAL_SEC, STARTUP_LOGO_URL, STARTUP_NOTICE, STATE_FILE, TARGET_AIRPORT_CODE
+from config import DISCORD_BOT_TOKEN, MODE, POLL_INTERVAL_SEC, STARTUP_LOGO_URL, STARTUP_NOTICE, STATE_FILE, TARGET_AIRPORT_CODE
 from diff import diff_states
 from discord_notifier import format_embed, post_discord
 from state import build_current_state, load_state, save_state, archive_state_snapshot
+import watch_list
 
 
 _JST = timezone(timedelta(hours=9))
@@ -98,6 +101,18 @@ def run_once() -> int:
         return 0
 
     events = diff_states(previous, current)
+
+    watches = watch_list.get()
+    if watches:
+        events = [
+            ev for ev in events
+            if any(
+                fn.strip().upper() in watches
+                for fn in (ev[1].get("flight_number") or "").split(",")
+                if fn.strip()
+            )
+        ]
+
     if not events:
         save_state(current)
         logging.info("No changes for %s.", TARGET_AIRPORT_CODE)
@@ -121,6 +136,12 @@ def run_once() -> int:
 def main() -> int:
     _setup_logging()
     run_forever = os.getenv("RUN_FOREVER", "1") == "1"
+
+    if DISCORD_BOT_TOKEN:
+        import bot as _bot
+        t = threading.Thread(target=_bot.run_bot, args=(DISCORD_BOT_TOKEN,), daemon=True)
+        t.start()
+        logging.info("Discord bot thread started.")
 
     # Optionally post a startup notice once per process start
     if STARTUP_NOTICE:
