@@ -9,6 +9,7 @@ This is a flight arrival and departure information for a specific airport using 
 - **Real-time Monitoring**: Fetches the latest flight information using the ODPT API.
 - **Differential Notifications**: Compares current data with previous state to detect and notify about new flights, status changes, or removals (optional).
 - **Discord Integration**: Sends notifications via Discord Webhooks using rich Embed formats.
+- **Slash Commands**: Configure a Discord Bot to filter notifications to specific flights using `/watch` and related commands.
 - **Flexible Configuration**: Choose to monitor arrivals, departures, or both.
 - **Multiple Environments**: Easily runs via Python natively, Docker, or Docker Compose.
 
@@ -44,6 +45,22 @@ cp .env.example .env
 | `RUN_FOREVER` | Set to `0` to run the check exactly once and exit. | `1` |
 | `STARTUP_NOTICE` | `1` to post a startup notice to Discord on launch, `0` to disable. | `1` |
 | `STARTUP_LOGO_URL` | Optional image URL for the startup notice (shown as a thumbnail). | - |
+| `DISCORD_BOT_TOKEN` | Discord Bot token. Required to enable slash command support. | - |
+
+## Slash Commands (Flight Watch Filter)
+
+Set `DISCORD_BOT_TOKEN` to enable the Discord Bot alongside the monitor.
+Once the Bot is invited to your server, you can manage which flights trigger notifications:
+
+| Command | Description |
+|---|---|
+| `/watch <flight>` | Add a flight to the watch list (e.g. `/watch JL584`) |
+| `/unwatch <flight>` | Remove a flight from the watch list |
+| `/watchlist` | Display the current watch list |
+
+When the watch list is **empty**, all flights are notified (default behavior).
+When flights are registered, **only those flights** will trigger notifications (codeshare numbers are also matched).
+The list is persisted in `data/watch_list.json` and survives restarts.
 
 ## Usage
 
