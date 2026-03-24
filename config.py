@@ -14,9 +14,8 @@ load_dotenv()
 
 ODPT_BASE_URL = os.getenv("ODPT_BASE_URL", "https://api.odpt.org/api/v4")
 ODPT_CONSUMER_KEY = os.environ["ODPT_CONSUMER_KEY"]
-DISCORD_WEBHOOK_URL = os.environ["DISCORD_WEBHOOK_URL"]
-# Optional: Discord bot token for slash command support (/watch, /unwatch, /watchlist)
-DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN", "").strip() or None
+DISCORD_BOT_TOKEN: str = os.environ["DISCORD_BOT_TOKEN"]
+DISCORD_CHANNEL_ID: int = int(os.environ["DISCORD_CHANNEL_ID"])
 
 # 3-letter IATA airport code only. Example: HKD
 AIRPORT = os.getenv("AIRPORT", "HKD").strip().upper()
@@ -29,9 +28,6 @@ NOTIFY_REMOVED = os.getenv("NOTIFY_REMOVED", "0") == "1"
 
 # Number of columns for Discord alert embeds (1-10)
 DISCORD_ALERT_COLUMN_NUM = int(os.getenv("DISCORD_ALERT_COLUMN_NUM", "3"))
-
-# Optional for Forum / Media channel thread posting
-DISCORD_THREAD_ID = os.getenv("DISCORD_THREAD_ID", "").strip()
 
 # Toggle for posting a startup notice to Discord on process launch
 STARTUP_NOTICE = os.getenv("STARTUP_NOTICE", "1") == "1"

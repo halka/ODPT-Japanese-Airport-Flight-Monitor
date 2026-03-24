@@ -1,19 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import time
 from typing import Any, Dict, List, Optional
 
 from config import (
     AIRLINE_MAP,
     AIRPORT_MAP,
-    DISCORD_THREAD_ID,
-    DISCORD_WEBHOOK_URL,
+    DISCORD_CHANNEL_ID,
     DISCORD_ALERT_COLUMN_NUM,
-    HTTP_TIMEOUT_SEC,
     TARGET_AIRPORT_CODE,
     TARGET_AIRPORT_ODPT_ID,
-    session,
 )
 from diff import changed_fields
 from utils import airport_code_from_odpt_id, j, terminal_display
@@ -228,49 +224,5 @@ def format_embed(event_type: str, item: Dict[str, Any], old_item: Optional[Dict[
     return embed
 
 def post_discord(embeds: List[Dict[str, Any]]) -> None:
-    params: Dict[str, Any] = {"wait": "true"}
-    if DISCORD_THREAD_ID:
-        params["thread_id"] = DISCORD_THREAD_ID
-
-    # Use Airport Name from config if available; fallback to ICAO code (e.g. HND)
-    airport_name = AIRPORT_MAP.get(TARGET_AIRPORT_CODE, {}).get("title", "???")
-    airport_name_code = TARGET_AIRPORT_CODE
-    info = AIRPORT_MAP.get(TARGET_AIRPORT_CODE)
-    if info and info.get("icao"):
-        airport_name_code = info["icao"]
-
-    payload = {
-        "username": f"{airport_name}({airport_name_code})",
-        "embeds": embeds,
-        "allowed_mentions": {"parse": []},
-    }
-
-    for _ in range(3):
-        resp = session.post(
-            DISCORD_WEBHOOK_URL,
-            params=params,
-            json=payload,
-            timeout=HTTP_TIMEOUT_SEC,
-        )
-
-        if resp.status_code != 429:
-            resp.raise_for_status()
-            return
-
-        retry_after = 1.0
-        try:
-            body = resp.json()
-            retry_after = float(body.get("retry_after", retry_after))
-        except Exception:
-            pass
-
-        header_retry = resp.headers.get("X-RateLimit-Reset-After") or resp.headers.get("Retry-After")
-        if header_retry:
-            try:
-                retry_after = max(retry_after, float(header_retry))
-            except ValueError:
-                pass
-
-        time.sleep(retry_after)
-
-    raise RuntimeError("Discord webhook rate-limited too many times")
+    import bot as _bot
+    _bot.post_embeds_sync(DISCORD_CHANNEL_ID, embeds)
