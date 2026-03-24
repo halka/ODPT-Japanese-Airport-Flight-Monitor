@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Real data is used to test Discord notifications.
+Real data is used to test Discord bot notifications.
 API data is fetched and all items are sent as "added" events.
-Since this will send real notifications to the Discord Webhook, be cautious when running on production channels.
+Since this will send real notifications to the configured Discord channel, be cautious when running on production channels.
 """
 
 import sys
+import threading
 import time
 
 from api import fetch_arrivals, fetch_departures, fetch_status_map
-from config import DISCORD_WEBHOOK_URL, MODE, TARGET_AIRPORT_CODE
+from config import DISCORD_BOT_TOKEN, MODE, TARGET_AIRPORT_CODE
 from discord_notifier import format_embed, post_discord
 from state import normalize
 from utils import airport_code_from_odpt_id
@@ -63,11 +64,11 @@ def _fetch_items(status_map: dict) -> list:
 
 
 def test_discord_live() -> int:
-    print("Testing Discord webhook with LIVE data...")
+    print("Testing Discord bot notification with LIVE data...")
 
-    if not DISCORD_WEBHOOK_URL:
-        print("Error: DISCORD_WEBHOOK_URL is not set.", file=sys.stderr)
-        return 1
+    import bot as _bot
+    t = threading.Thread(target=_bot.run_bot, args=(DISCORD_BOT_TOKEN,), daemon=True)
+    t.start()
 
     print(f"Target Airport : {TARGET_AIRPORT_CODE}")
     print(f"Mode           : {MODE}")

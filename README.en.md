@@ -2,14 +2,15 @@ Language: [日本語](README.md) | English
 
 # ODPT Japanese Airport Flight Monitor
 
-This is a flight arrival and departure information for a specific airport using the Public Transport Open Data Center (ODPT) API and sends notifications to Discord when changes are detected.
+This project fetches flight arrival and departure information for a specific airport using the Public Transport Open Data Center (ODPT) API and sends notifications via a Discord Bot when changes are detected.
 ![Hero](https://raw.githubusercontent.com/halka/ODPT-Japanese-Airport-Flight-Monitor/refs/heads/main/assets/images/hero-image.png)
+
 ## Key Features
 
 - **Real-time Monitoring**: Fetches the latest flight information using the ODPT API.
 - **Differential Notifications**: Compares current data with previous state to detect and notify about new flights, status changes, or removals (optional).
-- **Discord Integration**: Sends notifications via Discord Webhooks using rich Embed formats.
-- **Slash Commands**: Configure a Discord Bot to filter notifications to specific flights using `/watch` and related commands.
+- **Discord Bot Integration**: Sends rich Embed notifications directly via a Discord Bot.
+- **Slash Commands**: Filter notifications to specific flights using `/watch` and related commands.
 - **Flexible Configuration**: Choose to monitor arrivals, departures, or both.
 - **Multiple Environments**: Easily runs via Python natively, Docker, or Docker Compose.
 
@@ -21,7 +22,15 @@ This is a flight arrival and departure information for a specific airport using 
 ### Prerequisites
 - Docker and Docker Compose
 - [Public Transport Open Data Center](https://developer.odpt.org/) API Key (Consumer Key)
-- Discord Webhook URL
+- A Discord Bot token and a target channel ID
+
+### Preparing the Discord Bot
+
+1. Create an application and add a Bot in the [Discord Developer Portal](https://discord.com/developers/applications).
+2. Copy the Bot token (`DISCORD_BOT_TOKEN`).
+3. Invite the Bot to your server (required permissions: `Send Messages`, `Embed Links`, and `applications.commands` for slash commands).
+4. Right-click the target channel and select **Copy Channel ID** (`DISCORD_CHANNEL_ID`).
+   - For a forum thread, you can use the thread's own channel ID directly.
 
 ### Configuration
 
@@ -34,29 +43,28 @@ cp .env.example .env
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `ODPT_CONSUMER_KEY` | **(Required)** Your ODPT API key. | - |
-| `DISCORD_WEBHOOK_URL` | **(Required)** Your Discord webhook URL. | - |
+| `DISCORD_BOT_TOKEN` | **(Required)** Your Discord Bot token. | - |
+| `DISCORD_CHANNEL_ID` | **(Required)** ID of the channel (or thread) to post notifications to. | - |
 | `AIRPORT` | 3-letter IATA airport code you want to monitor. | `HKD` |
 | `MODE` | Notification mode (`arrivals`, `departures`, or `both`). | `both` |
 | `POLL_INTERVAL_SEC` | How frequently to check the API (in seconds). | `180` |
 | `NOTIFY_REMOVED` | Set to `1` to send an alert when a flight is removed. | `0` |
-| `DISCORD_ALERT_COLUMN_NUM` | Set Column's of Discord Notification | `3` |
-| `DISCORD_THREAD_ID` | Optional ID for Forum/Thread posting. | - |
+| `DISCORD_ALERT_COLUMN_NUM` | Number of columns in Discord notification embeds. | `3` |
 | `STATE_FILE` | Location to store the current flight state. | `data/state_[airport].json` |
 | `RUN_FOREVER` | Set to `0` to run the check exactly once and exit. | `1` |
 | `STARTUP_NOTICE` | `1` to post a startup notice to Discord on launch, `0` to disable. | `1` |
 | `STARTUP_LOGO_URL` | Optional image URL for the startup notice (shown as a thumbnail). | - |
-| `DISCORD_BOT_TOKEN` | Discord Bot token. Required to enable slash command support. | - |
 
 ## Slash Commands (Flight Watch Filter)
 
-Set `DISCORD_BOT_TOKEN` to enable the Discord Bot alongside the monitor.
-Once the Bot is invited to your server, you can manage which flights trigger notifications:
+Once the Bot is running and invited to your server, you can manage which flights trigger notifications:
 
 | Command | Description |
 |---|---|
 | `/watch <flight>` | Add a flight to the watch list (e.g. `/watch JL584`) |
 | `/unwatch <flight>` | Remove a flight from the watch list |
 | `/watchlist` | Display the current watch list |
+| `/help` | Show available commands |
 
 When the watch list is **empty**, all flights are notified (default behavior).
 When flights are registered, **only those flights** will trigger notifications (codeshare numbers are also matched).

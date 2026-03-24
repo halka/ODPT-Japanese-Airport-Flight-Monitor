@@ -2,15 +2,15 @@
 
 # ODPT Japanese Airport Flight Monitor
 
-このプロジェクトは、公共交通オープンデータセンター（ODPT）の API を利用して特定空港の到着・出発情報を取得し、変更を検知すると Discord に通知します。
+このプロジェクトは、公共交通オープンデータセンター（ODPT）の API を利用して特定空港の到着・出発情報を取得し、変更を検知すると Discord Bot を通じて通知します。
 ![Hero](https://raw.githubusercontent.com/halka/ODPT-Japanese-Airport-Flight-Monitor/refs/heads/main/assets/images/hero-image.png)
 
 ## 主な機能
 
 - **リアルタイム監視**: ODPT API を用いて最新のフライト情報を取得します。
 - **差分通知**: 直前の状態と比較し、新規便・ステータス変更・削除（任意）を検出して通知します。
-- **Discord 連携**: Discord Webhook を使い、リッチな Embed 形式で通知します。
-- **スラッシュコマンド**: Discord Bot を設定すると `/watch` などのコマンドで監視対象便を絞り込めます。
+- **Discord Bot 連携**: Discord Bot を使い、リッチな Embed 形式でフライト情報を通知します。
+- **スラッシュコマンド**: `/watch` などのコマンドで監視対象便を絞り込めます。
 - **柔軟な設定**: 到着・出発・両方のいずれかを選んで監視できます。
 - **複数の実行方法**: Python（ネイティブ）、Docker、Docker Compose に対応。
 
@@ -22,7 +22,15 @@
 ### 前提条件
 - Docker と Docker Compose
 - [公共交通オープンデータセンター（ODPT）](https://developer.odpt.org/) の API キー（Consumer Key）
-- Discord Webhook URL
+- Discord Bot トークンと通知先チャンネル ID
+
+### Discord Bot の準備
+
+1. [Discord Developer Portal](https://discord.com/developers/applications) でアプリケーションを作成し、Bot を追加します。
+2. Bot トークンをコピーします（`DISCORD_BOT_TOKEN`）。
+3. Bot をサーバーに招待します（必要な権限: `Send Messages`、`Embed Links`、スラッシュコマンド用に `applications.commands`）。
+4. 通知を送りたいチャンネルを右クリックし「チャンネル ID をコピー」で ID を取得します（`DISCORD_CHANNEL_ID`）。
+   - フォーラムチャンネルのスレッドに投稿したい場合は、スレッドの ID をそのまま使用できます。
 
 ### 設定
 
@@ -35,29 +43,28 @@ cp .env.example .env
 | 変数 | 説明 | 既定値 |
 |------|------|--------|
 | `ODPT_CONSUMER_KEY` | 【必須】ODPT の API キー。 | - |
-| `DISCORD_WEBHOOK_URL` | 【必須】Discord の Webhook URL。 | - |
+| `DISCORD_BOT_TOKEN` | 【必須】Discord Bot のトークン。 | - |
+| `DISCORD_CHANNEL_ID` | 【必須】通知先チャンネル（またはスレッド）の ID。 | - |
 | `AIRPORT` | 監視対象の IATA 空港コード（3 文字）。 | `HKD` |
 | `MODE` | 通知モード（`arrivals` / `departures` / `both`）。 | `both` |
 | `POLL_INTERVAL_SEC` | API をポーリングする間隔（秒）。 | `180` |
 | `NOTIFY_REMOVED` | 便が削除された際にも通知するなら `1`。 | `0` |
 | `DISCORD_ALERT_COLUMN_NUM` | Discord 通知のカラム数。 | `3` |
-| `DISCORD_THREAD_ID` | フォーラム/スレッドに投稿する場合の任意の ID。 | - |
 | `STATE_FILE` | 現在のフライト状態を保存するファイルの場所。 | `data/state_[airport].json` |
 | `RUN_FOREVER` | `0` にすると 1 回だけ実行して終了。 | `1` |
 | `STARTUP_NOTICE` | 起動時に Discord へ通知するなら `1`、無効は `0`。 | `1` |
 | `STARTUP_LOGO_URL` | 起動通知のサムネイルに使う任意の画像 URL。 | - |
-| `DISCORD_BOT_TOKEN` | Discord Bot のトークン。設定するとスラッシュコマンドが使用可能になる。 | - |
 
 ## スラッシュコマンド（監視フライト絞り込み）
 
-`DISCORD_BOT_TOKEN` を設定して起動すると、Discord Bot が有効になります。
-Bot をサーバーに招待した後、以下のコマンドで監視対象フライトを管理できます。
+起動すると Discord Bot が有効になり、以下のコマンドで監視対象フライトを管理できます。
 
 | コマンド | 説明 |
 |---|---|
 | `/watch <便名>` | 指定便を監視リストに追加（例: `/watch JL584`） |
 | `/unwatch <便名>` | 指定便を監視リストから削除 |
 | `/watchlist` | 現在の監視リストを表示 |
+| `/help` | コマンド一覧を表示 |
 
 監視リストが**空**の場合はすべてのフライトを通知します（デフォルト動作）。
 監視リストに便名が登録されている場合は、**そのフライトのみ**通知します（コードシェア便も一致対象）。

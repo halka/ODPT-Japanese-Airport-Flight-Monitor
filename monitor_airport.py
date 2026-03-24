@@ -11,7 +11,7 @@ import threading
 
 import requests
 
-from config import DISCORD_BOT_TOKEN, MODE, POLL_INTERVAL_SEC, STARTUP_LOGO_URL, STARTUP_NOTICE, STATE_FILE, TARGET_AIRPORT_CODE
+from config import DISCORD_BOT_TOKEN, DISCORD_CHANNEL_ID, MODE, POLL_INTERVAL_SEC, STARTUP_LOGO_URL, STARTUP_NOTICE, STATE_FILE, TARGET_AIRPORT_CODE
 from diff import diff_states
 from discord_notifier import format_embed, post_discord
 from state import build_current_state, load_state, save_state, archive_state_snapshot
@@ -137,11 +137,10 @@ def main() -> int:
     _setup_logging()
     run_forever = os.getenv("RUN_FOREVER", "1") == "1"
 
-    if DISCORD_BOT_TOKEN:
-        import bot as _bot
-        t = threading.Thread(target=_bot.run_bot, args=(DISCORD_BOT_TOKEN,), daemon=True)
-        t.start()
-        logging.info("Discord bot thread started.")
+    import bot as _bot
+    t = threading.Thread(target=_bot.run_bot, args=(DISCORD_BOT_TOKEN,), daemon=True)
+    t.start()
+    logging.info("Discord bot thread started (channel=%d).", DISCORD_CHANNEL_ID)
 
     # Optionally post a startup notice once per process start
     if STARTUP_NOTICE:
